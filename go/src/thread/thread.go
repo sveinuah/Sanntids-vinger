@@ -23,8 +23,8 @@ func main(){
 
 	i := 0
 
-	go increment(&i)
 	go decrement(&i)
+	go increment(&i)
 
 	time.Sleep(100*time.Millisecond)
 	Println("i = ",i)
