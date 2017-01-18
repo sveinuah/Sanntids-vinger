@@ -3,7 +3,7 @@
 
 * Parallelism: Processes running simultaneously, but not necessarily at the same moment - for instance share one cpu core
 
-* Multi-core: Because clock speed has an "upper limit" limited by heat
+* Multi-core: Because clock speed has an "upper limit" limited by heat, money!
 
 * Concurrency helps with timing problems and process duration. +Speed things up
 
@@ -15,13 +15,13 @@
 
 * Green threads: Artificial workspace where you can work with multithreaded without relying on the OS to allow this.
 
-* Co-routines: Several separate functions working on the same task, without a supervising main function
+* Co-routines: Several separate threads working on the same task, without a supervising scheduler
 
-* pthread_create(): green thread, threading.Thread(): thread, go: green thread
+* pthread_create(): thread, threading.Thread(): thread, go: green thread
 
-* GIL: Runs sequential -> Threads are not concurrent
+* GIL: Runs Concurrenty -> Threads are not parallel
 
-* Make more interpreters
+* Make more interpreters, HACK
 
 * Parameter for the Go scheduler used to decide how many OS threads can be run at the same time. (number of CPU cores on the machine)
 

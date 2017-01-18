@@ -1,0 +1,5 @@
+* Atomic operation: Operation is "hidden" from other threads, such that other threads cannot see intermediate operation data
+* Semaphore: A flag saying to other processes/threads that this resource is busy, and that it cannot be accessed at this point.
+* Mutex: Mutually Exclusive flag. It acts as a gate keeper to a section of code allowing one thread in and blocking access to all others.
+* Critical section: Parts of the program where shared resources are accessed are protected. This protected section is called the critical section.
+
