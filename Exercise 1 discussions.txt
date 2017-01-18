@@ -26,4 +26,4 @@
 * Parameter for the Go scheduler used to decide how many OS threads can be run at the same time. (number of CPU cores on the machine)
 
 4:
-i = ~-850000. This is because the functions call the same variable, perform their actions, and write their results to the memory. Because decrement() is called last, it overwrites the value written by Increment.
+i gives different results each run. This is because the functions call the same variable, perform their actions, and write their results to the memory. Because decrement() is called last, it overwrites the value written by Increment.
