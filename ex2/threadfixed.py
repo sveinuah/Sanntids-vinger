@@ -1,22 +1,20 @@
 from threading import Thread
-from threading import Lock
+from threading import RLock
 
 var = 0
-q = Queue()
+lock = RLock()
 
 def increment():
 	global var
 	for i in range(1000000):
-		var.aquire()
-		var = var + 1
-		var.release()
+		with lock:
+			var = var + 1
 
 def decrement():
 	global var
 	for i in range(1000000):
-		var.aquire()
-		var = var - 1
-		var.release()
+		with lock:
+			var = var - 1
 
 def main():
 	global var
