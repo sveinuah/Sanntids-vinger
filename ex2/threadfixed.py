@@ -1,16 +1,22 @@
 from threading import Thread
+from threading import Lock
 
 var = 0
+q = Queue()
 
 def increment():
 	global var
 	for i in range(1000000):
+		var.aquire()
 		var = var + 1
+		var.release()
 
 def decrement():
 	global var
 	for i in range(1000000):
-			var = var - 1
+		var.aquire()
+		var = var - 1
+		var.release()
 
 def main():
 	global var
