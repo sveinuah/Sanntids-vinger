@@ -1,17 +1,29 @@
 3: 
 * Concurrency: Processes running at the same moment in multi-core processors
+
 * Parallelism: Processes running simultaneously, but not necessarily at the same moment - for instance share one cpu core
+
 * Multi-core: Because clock speed has an "upper limit" limited by heat
+
 * Concurrency helps with timing problems and process duration. +Speed things up
+
 * Both: +: above. -: Shared resurces are hard to manage, more complex, need setup
+
 * Processes: An instance of an application, run on seperate memory
+
 * Threads: Run on shared memory
+
 * Green threads: Artificial workspace where you can work with multithreaded without relying on the OS to allow this.
+
 * Co-routines: Several separate functions working on the same task, without a supervising main function
-* pthread_create(): green thread, threading.Thread(): thread, go: thread
+
+* pthread_create(): green thread, threading.Thread(): thread, go: green thread
+
 * GIL: Runs sequential -> Threads are not concurrent
+
 * Make more interpreters
+
 * Parameter for the Go scheduler used to decide how many OS threads can be run at the same time. (number of CPU cores on the machine)
 
 4:
-i = ~-850000. This is because the functions call the same variable, perform their actions, and write their results to the memory. Because Decrement() is called last, it overwrites the value written by Increment.
+i = ~-850000. This is because the functions call the same variable, perform their actions, and write their results to the memory. Because decrement() is called last, it overwrites the value written by Increment.
