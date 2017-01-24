@@ -5,40 +5,38 @@ import (
 	"runtime"
 )
 
-var activeGoRoutines[2] int
-
-func increment(varChan chan int, it *int) {
+func increment(accessChan chan int, doneChan chan int, it *int) {
 	for i := 0; i < 1000000; i++ {
-		myTurn := <- varChan
+		myTurn := <- accessChan //If the access variable is in the channel continue, if not wait.
 		(*it)++
-		varChan <- myTurn
+		accessChan <- myTurn //return access variable
 	}
-	activeGoRoutines[0] = 0
+	doneChan <- 1 //send dummy value to say that the routine is done
 }
 
-func decrement(varChan chan int, it *int) {
+func decrement(accessChan chan int, doneChan chan int, it *int) {
 	for i := 0; i < 1000000; i++ {
-		myTurn := <- varChan
+		myTurn := <- accessChan //If the access variable is in the channel continue, if not wait.
 		(*it)--
-		varChan <- myTurn
+		accessChan <- myTurn //return access variable
 	}
-	activeGoRoutines[1] = 0
+	doneChan <- 1 //send dummy value to say that the routine is done
 }
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	i := 0
-	varChan := make(chan int,1)
-	varChan <- 1
+	accessChan := make(chan int,1)
+	accessChan <- 1
 
-	activeGoRoutines[1] = 1
-	go decrement(varChan, &i)
-	activeGoRoutines[0] = 1
-	go increment(varChan, &i)
+	doneChan := make(chan int)
 
-	for(activeGoRoutines[0]==1 || activeGoRoutines[1]==1){
-	}
+	go decrement(accessChan, doneChan, &i)
+	go increment(accessChan, doneChan, &i)
+
+	<-doneChan
+	<-doneChan
 
 	Println("i = ", i)
 
