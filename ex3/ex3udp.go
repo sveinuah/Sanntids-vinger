@@ -13,19 +13,12 @@ func CheckError(err error) {
 	}
 }
 
-func main() {
+func getServerMsg() {
 	sAddr, err := net.ResolveUDPAddr("udp", ":30000")
 	CheckError(err)
-	fmt.Println(sAddr)
-
-	//lAddr, err := net.ResolveUDPAddr("udp", "localhost:30000")
-
-	//conn, err := net.DialUDP("udp", nil, sAddr)
-	//CheckError(err)
 
 	conn, err := net.ListenUDP("udp", sAddr)
 	CheckError(err)
-	defer conn.Close()
 
 	buf := make([]byte, 1024)
 
@@ -33,26 +26,22 @@ func main() {
 	CheckError(err)
 	fmt.Println("Received: ", string(buf[0:n]), "From: ", addr)
 
-	serverAddr, err := net.ResolveUDPAddr("udp", "129.241.187.43:20014")
+	conn.Close()
+}
 
-	conn2, err := net.DialUDP("udp", nil, serverAddr)
-	CheckError(err)
-	defer conn2.Close()
+func main() {
+
+	getServerMsg()
 
 	quitChan := make(chan int, 2)
 
+	listenAddr, _ := net.ResolveUDPAddr("udp", ":20014")
+	conn2, err := net.ListenUDP("udp", listenAddr)
+	CheckError(err)
+	defer conn2.Close()
+
 	go listen(conn2, quitChan)
-	go write(serverAddr, conn2, quitChan)
-	/*
-		for {
-			conn2.WriteTo(msg, serverAddr)
-			n, _, _ := conn2.ReadFromUDP(buf)
-
-			fmt.Println("Received:", string(buf[0:n]))
-
-			time.Sleep(2 * time.Second)
-		}
-	*/
+	go write(conn2, quitChan)
 
 	<-quitChan
 	<-quitChan
@@ -60,7 +49,6 @@ func main() {
 
 func listen(conn *net.UDPConn, quitChan chan int) {
 	for {
-		fmt.Println("Tullball")
 		buf := make([]byte, 1024)
 		n, _, _ := conn.ReadFromUDP(buf)
 
@@ -68,13 +56,13 @@ func listen(conn *net.UDPConn, quitChan chan int) {
 	}
 }
 
-func write(serverAddr *net.UDPAddr, conn *net.UDPConn, quitChan chan int) {
+func write(conn *net.UDPConn, quitChan chan int) {
+	serverAddr, err := net.ResolveUDPAddr("udp", "129.241.187.43:20014")
+	CheckError(err)
+
 	for {
-		fmt.Println("SAddr:", serverAddr.String())
-		message := "Heo Sveio!"
-		msg := make([]byte, 1024)
-		copy(msg[:], message)
-		conn.WriteTo(msg, serverAddr)
+		_, err := conn.WriteToUDP([]byte("yo!"), serverAddr)
+		CheckError(err)
 		time.Sleep(2 * time.Second)
 	}
 }
