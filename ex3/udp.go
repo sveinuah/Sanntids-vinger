@@ -1,13 +1,9 @@
 package main
 
 import (
-	//"./Network-go/network/bcast"
-	"./Network-go/network/conn"
-	"./Network-go/network/localip"
-	//"./Network-go/network/peers"
-	. "fmt"
-	"log"
-	"net"
+	"./network/bcast"
+	"fmt"
+	"time"
 )
 
 type HelloMsg struct {
@@ -16,33 +12,26 @@ type HelloMsg struct {
 }
 
 func main() {
-	localid, err := localip.LocalIP()
-	if err != nil {
-		log.Fatal(err)
-	}
-	Println(localid)
-	pConn := conn.DialBroadcastUDP(30000)
+	helloTx := make(chan HelloMsg)
+	helloRX := make(chan HelloMsg)
 
-	var buf [1024]byte
-	n, addr, _ := pConn.ReadFrom(buf[0:])
-	Println(n)
-	Println(addr)
-	var str string
-	for i := 0; i < n; i++ {
-		str += string(buf[i])
-	}
-	Printf("%q", str)
+	go bcast.Transmitter(12000, helloTx)
+	go bcast.Receiver(12000, helloRX)
 
-	var tAddr net.Addr
-
-	tempAddr := addr.String()
-	for i := range buf {
-		if string(tempAddr[i]) == ":" {
-			break
+	go func() {
+		helloMsg := HelloMsg{"Echo? .. Echo? ... Echo?", 0}
+		for {
+			helloMsg.Iter++
+			helloTx <- helloMsg
+			time.Sleep (2 * time.Second)
 		}
+	}()
 
-		tAddr.String() += string(tempAddr[i])
-	}
-	var tBuf [1024]byte
-	pConn.WriteTo(tBuf, addr)
+	fmt.Println("Program started:")
+	for {
+		select {
+		case a := <-helloRX:
+			fmt.Println("Received:", a)
+		}
+	} 	
 }
