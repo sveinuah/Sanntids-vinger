@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"time"
 )
 
 func CheckError(err error) {
@@ -42,7 +43,7 @@ func LocalIP() string {
 }
 
 func main() {
-	port := "34933"
+	port := "33546"
 
 	tempAddr := getServerMsg()
 	splitAddr := strings.Split(tempAddr.String(), ":")
@@ -57,11 +58,45 @@ func main() {
 	localIP, err := net.ResolveTCPAddr("tcp", lIP)
 	CheckError(err)
 
-	conn, err := net.DialTCP("tcp", localIP, sAddr)
+	conn, err := net.DialTCP("tcp", nil, sAddr)
 	CheckError(err)
 
 	defer conn.Close()
 
 	fmt.Println(conn.RemoteAddr().String())
 
+	//message := "Da tester vi TCP!"
+	//iter := 0
+
+	//Ask for connection between server and client
+	waitChan := make(chan bool, 10)
+
+	//waitChan <- false
+	reqCon := "Connect to: " + lIP + "\x00"
+	fmt.Println(reqCon)
+
+	conn.Write([]byte(reqCon))
+
+	listener, err := net.ListenTCP("tcp", localIP)
+	CheckError(err)
+	TCPconn, err := listener.Accept()
+	fmt.Println("Listen tcp")
+
+	CheckError(err)
+
+	buf := make([]byte, 1024)
+	reqCon = "heihei\x00"
+	go func() {
+		for {
+			_, err = TCPconn.Read(buf)
+
+			CheckError(err)
+			TCPconn.Write([]byte(reqCon))
+
+			fmt.Println(string(buf))
+			time.Sleep(2 * time.Second)
+
+		}
+	}()
+	<-waitChan
 }
