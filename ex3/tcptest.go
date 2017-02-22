@@ -16,7 +16,7 @@ func main() {
 
 	dataChanTx := make(chan []byte, 1)
 	dataChanRx := make(chan []byte, 1)
-	connChan := make(chan *net.Conn, 1)
+	connChan := make(chan *net.TCPConn, 1)
 	terminateChan := make(chan bool, 1)
 
 	Target := UnitType{"129.241.187.43", "33546"}
@@ -30,7 +30,7 @@ func main() {
 	fmt.Print("Success!")
 
 	go func() {
-		var received []byte
+		received := make([]byte, 1024)
 		for {
 			select {
 			case received <- dataChanRx:
@@ -59,7 +59,7 @@ func CheckError(err error) {
 	}
 }
 
-func InitiateTCPCon(Target UnitType, Client UnitType) (conn *net.TCPConn) {
+func InitiateTCPCon(Target UnitType, Client UnitType) (TCPconn *net.TCPConn) {
 
 	tempAddress := Target.IP + ":" + Target.Port
 	targetAddress, _ := net.ResolveTCPAddr("tcp", tempAddress)
@@ -73,15 +73,13 @@ func InitiateTCPCon(Target UnitType, Client UnitType) (conn *net.TCPConn) {
 	ln, err := net.ListenTCP("tcp", localAddress)
 	CheckError(err)
 
-	TCPconn, err := ln.Accept()
+	TCPconn, err = ln.Accept()
 	CheckError(err)
 
-	conn = TCPconn
-
-	return conn
+	return TCPconn
 }
 
-func CommunicateOnTCP(connChan chan *net.Conn, dataChanTx chan []byte, dataChanRx chan []byte, terminateChan chan bool) {
+func CommunicateOnTCP(connChan chan *net.TCPConn, dataChanTx chan []byte, dataChanRx chan []byte, terminateChan chan bool) {
 
 	buf := make([]byte, 1024)
 	var conn *net.TCPConn
