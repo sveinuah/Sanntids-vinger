@@ -1,46 +1,73 @@
 package main
 
 import (
+	"bcast"
 	"fmt"
-	"io"
-	"log"
-	"os"
 	"os/exec"
+	"time"
 )
 
 func main() {
-	backup := make(chan int)
-	startChan := make(chan bool)
-	go mainCounter(backup, startChan, os.Stdout, 0)
+	backupChan := make(chan int, 1)
+	rxbackup := make(chan int, 1)
+
+	var id = "backup"
+	var num = 0
+
+	go bcast.Receiver(20014, rxbackup)
+
+	active := false
+	switch active {
+	case false:
+		fmt.Println("Hei jeg er", id)
+
+		timer := time.NewTimer(1000 * time.Millisecond)
+
+		for !active {
+			select {
+			case num = <-rxbackup:
+				if !timer.Stop() {
+					<-timer.C
+				}
+				timer.Reset(1000 * time.Millisecond)
+			case <-timer.C:
+				active = true
+			default:
+			}
+		}
+
+		fallthrough
+
+	case true:
+		id = "master"
+		spawnBackup()
+		fmt.Println("Jeg er", id)
+		mainCounter(backupChan, num)
+	}
 
 }
 
-func mainCounter(backup chan int, startChan chan bool, stdout *os.File, num int) {
-	go spawnBackup(backup, startChan)
-	os.Stdout = stdout
-	fmt.Println("Starting count")
+func spawnBackup() {
+	term := exec.Command("gnome-terminal", "gnome-terminal", "-e", "go run Sanntids-vinger/ex6/src/backup/backup.go")
+	term.Start()
+
+	//startUp := "go run backup.go -id=backup"
+
+	//term.Write([]byte(startUp))
+}
+
+func mainCounter(backupChan chan int, num int) {
+	go bcast.Transmitter(20014, backupChan)
+	printTime := time.Tick(1 * time.Second)
+	backupTime := time.Tick(10 * time.Millisecond)
 	for {
-		num++
-		fmt.Println(num)
-	}
-
-}
-
-func spawnBackup(backup chan int, startChan chan bool) {
-	cmd := exec.Command("start", "cmd")
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
-	io.WriteString(cmd.Stdout, "Hei! Jeg er backup!")
-
-	var num int
-	running := true
-	for running == true {
 		select {
-		case num = <-backup:
-		case running = <-startChan:
+		case <-printTime:
+			num++
+			fmt.Println(num)
+		case <-backupTime:
+			backupChan <- num
+		default:
 		}
 	}
-	mainCounter(backup, startChan, cmd.Stdout, num)
 }
