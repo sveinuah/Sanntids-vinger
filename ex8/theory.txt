@@ -1,0 +1,48 @@
+Task 1
+	1. We assign priorities to tasks to make sure important/time critical tasks are handled in/on time.
+	2. We must be able to follow the scheduler algorithm in order to debug the system, and make sure it behaves in the way we want.
+
+Task 2
+	1. Without priority inheritance
+	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14
+a					E							Q	V	E	
+b 			E	V		V	E	E	E
+c 	E	Q								Q	Q				E
+
+	2. With priority inheritance
+	0	1	2	3	4	5	6	7	8	9	10	11	12	13	14
+a					E			Q		V	E
+b 			E	V					V			E	E	E
+c 	E	Q				Q	Q								E
+
+Task 3
+	1. Priority inversion is when a high-priority task has to wait for a low-priority task. Unbounded priority inversion is when this stalls the program because the low-priority task has to wait for a higher-priority task to finish and so on.
+	2. Priority inheritance does not prevent deadlocks because it does not predict the use of resources, it only "resolves" priority inversion as it happens.
+
+Task 4
+	1. -Assumptions: Feasibility
+		- The application is assumed to consist of a fixed set of tasks: Realistic
+		- All tasks are periodic, with known periods: Realistic
+		- The tasks are completely independent of each other: Realistic
+		- All system overheads, context-switching times and so on are ignored (that is, assumed to have zero cost): Might be realistic
+		- All tasks have deadlines equal to their periods (that is, each task must complete before it is next released): Can be realistic
+		- All tasks have fixed worst-case execution times: Not very realistic
+		- No task contains any internal suspension points (e. g. an internal delay statement or a blocking I/O request): This is good code quality.
+		- All tasks execute on a single processor (CPU): Realistic
+
+	2. U = 15/50 + 10/30 + 5/20 = 0.883 > 0.780 = 3*(2^(1/3) - 1)
+	Utilization fails.
+	3. Priority is assumed: c > b > a ?
+		a. 	w0 = 15
+			w1 = 15 + ceil(15/30)*10 + ceil(15/20)*5 = 15 + 10 + 5 = 30
+			w2 = 15 + ceil(30/30)*10 + ceil(30/20)*5 = 15 + 10 + 10 = 35
+			w3 = 15 + ceil(35/30)*10 + ceil(35/20)*5 = 15 + 20 + 10 = 45
+			w4 = 15 + ceil(45/30)*10 + ceil(45/20)*5 = 15 + 20 + 15 = 50
+			w5 = 15 + ceil(50/30)*10 + ceil(50/20)*5 = 15 + 20 + 15 = 50
+			=> Ra = 50 <= 50, ok
+		b. 	w0 = 10
+			w1 = 10 + ceil(10/20)*5 = 15
+			w2 = 10 + ceil(15/20)*5 = 15
+			=> Rb = 15 <= 30, ok
+		c. 	w0 = 5 => Rc = 5 <= 20, ok
+		Task set is schedulable. The utilization test is sufficient, but not necessary.
